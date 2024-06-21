@@ -258,7 +258,7 @@ img {
   grid-column: 1/3;
 }
 
-.intro__description {
+.intro__summary {
   grid-column: 1/2;
 }
 
@@ -275,7 +275,7 @@ img {
   padding-bottom: var(--space-2);
 }
 
-.post-item__description {
+.post-item__summary {
   margin-bottom: var(--space-2);
 }
 
@@ -293,6 +293,10 @@ img {
 
 .post__visual__media {
   margin-bottom: var(--space-2);
+}
+
+.post > :not(.post__visual) {
+  grid-column: 2/3;
 }
 
 .post__text {

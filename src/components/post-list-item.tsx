@@ -1,24 +1,24 @@
 import React from "react"
 import { Link } from "gatsby"
-import Image, { FluidObject } from "gatsby-image"
+import { GatsbyImage } from "gatsby-plugin-image"
 
 interface Props {
   key: string
-  date: string
+  coverImageSrc?: unknown
+  coverImageAlt?: string
   title: string
+  summary: string
+  date: string
   to: string
-  description: string
-  alt: string
-  fluid: FluidObject
 }
 
-export default function CardPost(props: Props) {
-  const { key, date, title, to, description, alt, fluid } = props
+export default function PostListItem(props: Props) {
+  const { key, coverImageSrc, coverImageAlt, title, summary, date, to } = props
 
   return (
     <li className="post-item" key={key}>
       <figure className="post-item__thumb">
-        <Image alt={alt} fluid={fluid} />
+        <GatsbyImage alt={coverImageAlt} image={coverImageSrc} />
       </figure>
       <article>
         <h3>
@@ -26,7 +26,7 @@ export default function CardPost(props: Props) {
             {title}
           </Link>
         </h3>
-        <p className="post-item__description">{description}</p>
+        <p className="post-item__summary">{summary}</p>
         <h6>{date}</h6>
       </article>
     </li>

@@ -10,7 +10,7 @@ interface Props {
   activeClassName?: string
 }
 
-export default function LinkNav(props: Props) {
+export default function NavigationLink(props: Props) {
   const { id, title, ariaLabel, children, to, activeClassName } = props
   return (
     <Link
@@ -26,6 +26,6 @@ export default function LinkNav(props: Props) {
   )
 }
 
-LinkNav.defaultProps = {
+NavigationLink.defaultProps = {
   activeClassName: "active",
 }

@@ -1,5 +1,5 @@
 import React from "react"
-import LinkNav from "./LinkNav"
+import NavigationLink from "./navigation-link"
 
 export default function Navigation() {
   return (
@@ -7,19 +7,19 @@ export default function Navigation() {
       <nav className="nav">
         <ul className="list list_nav">
           <li className="list__item">
-            <LinkNav title="Return Home" aria-label="Return Home" to="/">
+            <NavigationLink title="Return Home" aria-label="Return Home" to="/">
               Home
-            </LinkNav>
+            </NavigationLink>
           </li>
           <li className="list__item">
-            <LinkNav
+            <NavigationLink
               title="About me"
               aria-label="About me"
               to="/about"
               activeClassName="active"
             >
               About
-            </LinkNav>
+            </NavigationLink>
           </li>
         </ul>
       </nav>

@@ -1,64 +1,46 @@
 import React from "react"
 import { graphql, PageProps } from "gatsby"
-import Image, { FluidObject, FixedObject } from "gatsby-image"
 import { HelmetDatoCms } from "gatsby-source-datocms"
 
-import Bio from "../components/Bio"
-import Layout from "../components/Layout"
-import ListPost from "../components/ListPost"
+import PageHeader from "../components/page-header"
+import Layout from "../components/layout"
+import PostBody from "../components/post-body"
+import ListPost from "../components/post-suggestions"
+import Bio from "../components/bio"
 
 type Data = {
-  datoCmsSite: {
-    globalSeo: {
-      siteName: string
-    }
+  site: {
+    favicon: []
   }
-  datoCmsPost: {
-    seo: {
-      image: {
-        fixed: FixedObject
-      }
+  post: {
+    seo: []
+    coverImage: {
+      alt: string
       title: string
-      description: string
-    }
-    seoMetaTags: {
-      tags: []
+      gatsbyImageData: []
     }
     title: string
+    summary: string
     date: string
-    hero: {
-      alt: string
-      fluid: FluidObject
-    }
-    body: {
-      id: string
-      model: {
-        apiKey: string
+    content: {
+      value: string
+      blocks: {
+        __typename: string
         id: string
+        image: []
       }
-      textNode: {
-        childMarkdownRemark: {
-          html: string
-        }
-      }
-      media: {
-        alt: string
-        fluid: FluidObject
-        title: string
-      }
-    }[]
-
-    pageContext: {
-      next: {
-        slug: string
-        title: string
-      }
-      previous: {
-        slug: string
-        title: string
-      }
-      slug: string
     }
+  }
+  pageContext: {
+    next: {
+      slug: string
+      title: string
+    }
+    previous: {
+      slug: string
+      title: string
+    }
+    slug: string
   }
 }
 
@@ -69,49 +51,17 @@ export default function BlogPostTemplate(props: PageProps<Data>) {
 
   return (
     <Layout>
-      <HelmetDatoCms seo={data.datoCmsPost.seoMetaTags} />
+      <HelmetDatoCms seo={data.post.seo} favicon={data.site.favicon} />
       <article>
-        <header className="container intro">
-          <figure className="intro__hero intro__hero_post">
-            <Image
-              alt={data.datoCmsPost.hero.alt}
-              fluid={data.datoCmsPost.hero.fluid}
-            />
-          </figure>
-          <h1 className="intro__title">{data.datoCmsPost.title}</h1>
-          <h5 className="intro__description">
-            {data.datoCmsPost.seo.description}
-          </h5>
-          <h6 className="intro__description">{data.datoCmsPost.date}</h6>
-        </header>
-        <section className="post">
-          {data.datoCmsPost.body.map((block) => (
-            <div
-              className={
-                block.model.apiKey === "visual" ? "post__visual" : "post__text"
-              }
-              key={block.id}
-            >
-              {block.model.apiKey === "text" && (
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: block.textNode.childMarkdownRemark.html,
-                  }}
-                />
-              )}
-              {block.model.apiKey === "visual" && (
-                <figure>
-                  <Image
-                    className="post__visual__media"
-                    fluid={block.media.fluid}
-                    alt={block.media.alt}
-                  />
-                  <figcaption>{block.media.title}</figcaption>
-                </figure>
-              )}
-            </div>
-          ))}
-        </section>
+        <PageHeader
+          coverImageSrc={data.post.coverImage.gatsbyImageData}
+          coverImageAlt={data.post.coverImage.alt}
+          coverImageCaption={data.post.coverImage.title}
+          title={data.post.title}
+          summary={data.post.summary}
+          date={data.post.date}
+        />
+        <PostBody content={data.post.content} />
       </article>
       {previous || next ? (
         <nav className="container">
@@ -139,48 +89,37 @@ export default function BlogPostTemplate(props: PageProps<Data>) {
 }
 
 export const pageQuery = graphql`
-  query BlogPostBySlug($slug: String!) {
-    datoCmsPost(slug: { eq: $slug }) {
-      seo {
-        description
+  query ($slug: String!) {
+    site: datoCmsSite {
+      favicon: faviconMetaTags {
+        ...GatsbyDatoCmsFaviconMetaTags
       }
-      seoMetaTags {
-        ...GatsbyDatoCmsSeoMetaTags
+    }
+    post: datoCmsPostNext(slug: { eq: $slug }) {
+      coverImage {
+        alt
+        gatsbyImageData(width: 1500)
+      }
+      title
+      summary
+      date(formatString: "MMMM DD, YYYY")
+      content {
+        value
+        blocks {
+          __typename
+          id: originalId
+          image {
+            alt
+            gatsbyImageData(width: 1500)
+          }
+          externalVideo {
+            url
+          }
+        }
       }
       slug
-      title
-      date(formatString: "MMMM DD, YYYY")
-      hero {
-        alt
-        fluid(maxWidth: 1200) {
-          ...GatsbyDatoCmsFluid
-        }
-      }
-      body {
-        ... on DatoCmsText {
-          id
-          model {
-            apiKey
-          }
-          textNode {
-            childMarkdownRemark {
-              html
-            }
-          }
-        }
-        ... on DatoCmsVisual {
-          id
-          model {
-            apiKey
-          }
-          media {
-            fluid(maxWidth: 1200) {
-              ...GatsbyDatoCmsFluid
-            }
-            title
-            alt
-          }
-        }
+      seo: seoMetaTags {
+        ...GatsbyDatoCmsSeoMetaTags
       }
     }
   }

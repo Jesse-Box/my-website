@@ -1,38 +1,23 @@
 import React from "react"
 import { PageProps, graphql } from "gatsby"
-import { FluidObject } from "gatsby-image"
 import { HelmetDatoCms } from "gatsby-source-datocms"
 
-import Layout from "../components/Layout"
-import HeaderPage from "../components/HeaderPage"
-import CardPost from "../components/CardPost"
+import Layout from "../components/layout"
+import HeaderPage from "../components/page-header"
+import PostList from "../components/post-list"
 
 interface Data {
-  datoCmsHome: {
-    seoMetaTags: {
-      tags: []
-    }
-    header: string
-    subheaderNode: {
-      childMarkdownRemark: {
-        html: string
-      }
-    }
+  site: {
+    favicon: []
+  }
+  home: {
+    seo: []
+  }
+  about: {
+    title: string
+    summary: string
     linkTo: string
     linkLabel: string
-  }
-  allDatoCmsPost: {
-    edges: {
-      node: {
-        slug: string
-        title: string
-        date: string
-        hero: {
-          alt: string
-          fluid: FluidObject
-        }
-      }
-    }
   }
 }
 
@@ -41,67 +26,35 @@ export default function BlogIndex(props: PageProps<Data>) {
 
   return (
     <Layout>
-      <HelmetDatoCms seo={data.datoCmsHome.seoMetaTags} />
+      <HelmetDatoCms seo={data.home.seo} favicon={data.site.favicon} />
       <HeaderPage
-        header={data.datoCmsHome.header}
-        subheader={data.datoCmsHome.subheaderNode.childMarkdownRemark.html}
-        linkTo={data.datoCmsHome.linkTo}
-        linkLabel={data.datoCmsHome.linkLabel}
+        title={data.about.title}
+        summary={data.about.summary}
+        linkTo={data.about.linkTo}
+        linkLabel={data.about.linkLabel}
       />
-      <section>
-        <h6>Recent Posts</h6>
-        <ul className="list">
-          {data.allDatoCmsPost.edges.map(({ node }) => {
-            return (
-              <CardPost
-                key={node.slug}
-                date={node.date}
-                title={node.title}
-                to={node.slug}
-                description={node.seo.description}
-                alt={node.alt}
-                fluid={node.hero.fluid}
-              />
-            )
-          })}
-        </ul>
-      </section>
+      <PostList />
     </Layout>
   )
 }
 
 export const pageQuery = graphql`
   query {
-    datoCmsHome {
-      seoMetaTags {
+    site: datoCmsSite {
+      favicon: faviconMetaTags {
+        ...GatsbyDatoCmsFaviconMetaTags
+      }
+    }
+    home: datoCmsHomeNext {
+      seo: seoMetaTags {
         ...GatsbyDatoCmsSeoMetaTags
       }
-      header
-      subheaderNode {
-        childMarkdownRemark {
-          html
-        }
-      }
+    }
+    about: datoCmsAboutNext {
+      title
+      summary
       linkTo
       linkLabel
-    }
-    allDatoCmsPost(sort: { fields: date, order: DESC }) {
-      edges {
-        node {
-          slug
-          title
-          date(formatString: "MMMM DD, YYYY")
-          seo {
-            description
-          }
-          hero {
-            alt
-            fluid(maxWidth: 800) {
-              ...GatsbyDatoCmsFluid
-            }
-          }
-        }
-      }
     }
   }
 `

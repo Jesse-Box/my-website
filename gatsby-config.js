@@ -2,6 +2,19 @@ require("dotenv").config({
   path: `.env.${process.env.NODE_ENV}`,
 })
 
+const path = require("path")
+// Get paths of Gatsby's required rules, which as of writing is located at:
+// https://github.com/gatsbyjs/gatsby/tree/fbfe3f63dec23d279a27b54b4057dd611dce74bb/packages/
+// gatsby/src/utils/eslint-rules
+const gatsbyRequiredRules = path.join(
+  process.cwd(),
+  "node_modules",
+  "gatsby",
+  "dist",
+  "utils",
+  "eslint-rules"
+)
+
 module.exports = {
   siteMetadata: {
     siteUrl: `https://www.jessebox.net/`,
@@ -18,13 +31,14 @@ module.exports = {
     {
       resolve: "gatsby-plugin-eslint",
       options: {
-        test: /\.js$|\.jsx$|\.ts$|\.tsx$/,
-        exclude: /(node_modules|.cache|public)/,
+        // Gatsby required rules directory
+        rulePaths: [gatsbyRequiredRules],
+        // Default settings that may be omitted or customized
         stages: ["develop"],
-        options: {
-          emitWarning: true,
-          failOnError: false,
-        },
+        extensions: ["js", "jsx", "ts", "tsx"],
+        exclude: ["node_modules", "bower_components", ".cache", "public"],
+        // Any additional eslint-webpack-plugin options below
+        // ...
       },
     },
     {
@@ -65,6 +79,7 @@ module.exports = {
         ],
       },
     },
+    `gatsby-plugin-image`,
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
     `gatsby-plugin-sitemap`,

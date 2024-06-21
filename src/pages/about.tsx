@@ -1,44 +1,32 @@
 import React from "react"
 import { PageProps, graphql } from "gatsby"
 import { HelmetDatoCms } from "gatsby-source-datocms"
-import Image, { FluidObject } from "gatsby-image"
 
-import Layout from "../components/Layout"
-import HeaderPage from "../components/HeaderPage"
+import Layout from "../components/layout"
+import PageHeader from "../components/page-header"
+import PostBody from "../components/post-body"
 
 interface Data {
-  datoCmsAbout: {
-    seoMetaTags: {
-      tags: []
-    }
-    hero: {
+  site: {
+    favicon: []
+  }
+  about: {
+    seo: []
+    coverImage: {
       alt: string
       title: string
-      fluid: FluidObject
+      gatsbyImageData: []
     }
-    header: string
-    subheaderNode: {
-      childMarkdownRemark: {
-        html: string
-      }
-    }
-    body: {
-      id: string
-      model: {
-        apiKey: string
+    title: string
+    summary: string
+    content: {
+      value: string
+      blocks: {
+        __typename: string
         id: string
+        image: []
       }
-      textNode: {
-        childMarkdownRemark: {
-          html: string
-        }
-      }
-      media: {
-        alt: string
-        fluid: FluidObject
-        title: string
-      }
-    }[]
+    }
   }
 }
 
@@ -47,39 +35,16 @@ export default function About(props: PageProps<Data>) {
 
   return (
     <Layout>
-      <HelmetDatoCms seo={data.datoCmsAbout.seoMetaTags} />
+      <HelmetDatoCms seo={data.about.seo} favicon={data.site.favicon} />
       <article>
-        <HeaderPage
-          hero={data.datoCmsAbout.hero.fluid}
-          alt={data.datoCmsAbout.hero.alt}
-          caption={data.datoCmsAbout.hero.title}
-          header={data.datoCmsAbout.header}
-          subheader={data.datoCmsAbout.subheaderNode.childMarkdownRemark.html}
+        <PageHeader
+          coverImageSrc={data.about.coverImage.gatsbyImageData}
+          coverImageAlt={data.about.coverImage.alt}
+          coverImageCaption={data.about.coverImage.title}
+          title={data.about.title}
+          summary={data.about.summary}
         />
-        <section className="post">
-          {data.datoCmsAbout.body.map((block) => (
-            <div
-              className={
-                block.model.apiKey === "visual" ? "post__visual" : "post__text"
-              }
-              key={block.id}
-            >
-              {block.model.apiKey === "text" && (
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: block.textNode.childMarkdownRemark.html,
-                  }}
-                />
-              )}
-              {block.model.apiKey === "visual" && (
-                <figure className="post__visual__media">
-                  <Image fluid={block.media.fluid} alt={block.media.alt} />
-                  <figcaption>{block.media.title}</figcaption>
-                </figure>
-              )}
-            </div>
-          ))}
-        </section>
+        <PostBody content={data.about.content} />
       </article>
     </Layout>
   )
@@ -87,48 +52,31 @@ export default function About(props: PageProps<Data>) {
 
 export const pageQuery = graphql`
   query {
-    datoCmsAbout {
-      seoMetaTags {
-        ...GatsbyDatoCmsSeoMetaTags
+    site: datoCmsSite {
+      favicon: faviconMetaTags {
+        ...GatsbyDatoCmsFaviconMetaTags
       }
-      hero {
+    }
+    about: datoCmsAboutNext {
+      coverImage {
         alt
-        fluid(maxWidth: 1200) {
-          ...GatsbyDatoCmsFluid
-        }
         title
+        gatsbyImageData(width: 1500)
       }
-      header
-      subheaderNode {
-        childMarkdownRemark {
-          html
+      title
+      summary
+      content {
+        value
+        blocks {
+          __typename
+          id: originalId
+          image {
+            gatsbyImageData(width: 1500)
+          }
         }
       }
-      body {
-        ... on DatoCmsText {
-          id
-          model {
-            apiKey
-          }
-          textNode {
-            childMarkdownRemark {
-              html
-            }
-          }
-        }
-        ... on DatoCmsVisual {
-          id
-          model {
-            apiKey
-          }
-          media {
-            fluid(maxWidth: 1200) {
-              ...GatsbyDatoCmsFluid
-            }
-            title
-            alt
-          }
-        }
+      seo: seoMetaTags {
+        ...GatsbyDatoCmsSeoMetaTags
       }
     }
   }

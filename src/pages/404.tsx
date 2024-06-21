@@ -1,38 +1,21 @@
 import React from "react"
 import { PageProps, graphql } from "gatsby"
-import { FluidObject } from "gatsby-image"
 import { HelmetDatoCms } from "gatsby-source-datocms"
 
-import Layout from "../components/Layout"
-import HeaderPage from "../components/HeaderPage"
-import CardPost from "../components/CardPost"
+import Layout from "../components/layout"
+import HeaderPage from "../components/page-header"
+import PostList from "../components/post-list"
 
 interface Data {
-  datoCmsNotFound: {
-    seoMetaTags: {
-      tags: []
-    }
-    header: string
-    subheaderNode: {
-      childMarkdownRemark: {
-        html: string
-      }
-    }
+  site: {
+    favicon: []
+  }
+  notFound: {
+    seo: []
+    title: string
+    summary: string
     linkTo: string
     linkLabel: string
-  }
-  allDatoCmsPost: {
-    edges: {
-      node: {
-        slug: string
-        title: string
-        date: string
-        hero: {
-          alt: string
-          fluid: FluidObject
-        }
-      }
-    }
   }
 }
 
@@ -41,67 +24,33 @@ export default function NotFoundPage(props: PageProps<Data>) {
 
   return (
     <Layout>
-      <HelmetDatoCms seo={data.datoCmsNotFound.seoMetaTags} />
+      <HelmetDatoCms seo={data.notFound.seo} favicon={data.site.favicon} />
       <HeaderPage
-        header={data.datoCmsNotFound.header}
-        subheader={data.datoCmsNotFound.subheaderNode.childMarkdownRemark.html}
-        linkTo={data.datoCmsNotFound.linkTo}
-        linkLabel={data.datoCmsNotFound.linkLabel}
+        title={data.notFound.title}
+        summary={data.notFound.summary}
+        linkTo={data.notFound.linkTo}
+        linkLabel={data.notFound.linkLabel}
       />
-      <section>
-        <h6>Recent Posts</h6>
-        <ul className="list">
-          {data.allDatoCmsPost.edges.map(({ node }) => {
-            return (
-              <CardPost
-                key={node.slug}
-                date={node.date}
-                title={node.title}
-                to={node.slug}
-                description={node.seo.description}
-                alt={node.alt}
-                fluid={node.hero.fluid}
-              />
-            )
-          })}
-        </ul>
-      </section>
+      <PostList />
     </Layout>
   )
 }
 
 export const pageQuery = graphql`
   query {
-    datoCmsNotFound {
-      seoMetaTags {
+    site: datoCmsSite {
+      favicon: faviconMetaTags {
+        ...GatsbyDatoCmsFaviconMetaTags
+      }
+    }
+    notFound: datoCmsNotFoundNext {
+      seo: seoMetaTags {
         ...GatsbyDatoCmsSeoMetaTags
       }
-      header
-      subheaderNode {
-        childMarkdownRemark {
-          html
-        }
-      }
+      title
+      summary
       linkTo
       linkLabel
-    }
-    allDatoCmsPost(sort: { fields: date, order: DESC }) {
-      edges {
-        node {
-          slug
-          title
-          date(formatString: "MMMM DD, YYYY")
-          seo {
-            description
-          }
-          hero {
-            alt
-            fluid(maxWidth: 800) {
-              ...GatsbyDatoCmsFluid
-            }
-          }
-        }
-      }
     }
   }
 `

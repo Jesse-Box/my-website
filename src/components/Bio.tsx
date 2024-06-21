@@ -3,13 +3,9 @@ import { Link } from "gatsby"
 import { useStaticQuery, graphql } from "gatsby"
 
 interface Data {
-  datoCmsAbout: {
-    header: string
-    subheaderNode: {
-      childMarkdownRemark: {
-        html: "string"
-      }
-    }
+  about: {
+    title: string
+    summary: string
     linkTo: string
     linkLabel: string
   }
@@ -17,14 +13,10 @@ interface Data {
 
 export default function Bio() {
   const data: Data = useStaticQuery(graphql`
-    query BioQuery {
-      datoCmsAbout {
-        header
-        subheaderNode {
-          childMarkdownRemark {
-            html
-          }
-        }
+    query {
+      about: datoCmsAboutNext {
+        title
+        summary
         linkTo
         linkLabel
       }
@@ -33,16 +25,13 @@ export default function Bio() {
 
   return (
     <section className="container intro">
-      <h2 className="intro__title">{data.datoCmsAbout.header}</h2>
-      <div
-        className="intro__description"
-        dangerouslySetInnerHTML={{
-          __html: data.datoCmsAbout.subheaderNode.childMarkdownRemark.html,
-        }}
-      />
-      <div className="intro__description">
-        <Link to={data.datoCmsAbout.linkTo}>{data.datoCmsAbout.linkLabel}</Link>
-      </div>
+      <h2 className="intro__title">{data.about.title}</h2>
+      <h5 className="intro__summary">{data.about.summary}</h5>
+      {data.about.linkTo ? (
+        <div className="intro__summary">
+          <Link to={data.about.linkTo}>{data.about.linkLabel} </Link>
+        </div>
+      ) : null}
     </section>
   )
 }
